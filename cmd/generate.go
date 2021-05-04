@@ -23,6 +23,7 @@ var generateCmd = &cobra.Command{
 }
 
 func runGenerateCmd(cmd *cobra.Command, args []string) (err error) {
+	fmt.Println(config.Template[0])
 	err = generateNippo()
 	return
 }
