@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -23,15 +24,18 @@ var generateCmd = &cobra.Command{
 }
 
 func runGenerateCmd(cmd *cobra.Command, args []string) (err error) {
-	fmt.Println(config.Template[0])
+	fmt.Println(config.Template)
 	err = generateNippo()
 	return
 }
 
 // 日報作成
 func generateNippo() (err error) {
+	// init default content
+	defaultContent, err := initDefaultContent()
+
 	// make tmp file
-	fpath, err := makeTmpFile("### nippo\n")
+	fpath, err := makeTmpFile(defaultContent)
 	if err != nil {
 		fmt.Fprint(os.Stdout, fmt.Sprintf("failed make edit file. %s\n", err.Error()))
 		return
@@ -54,6 +58,18 @@ func generateNippo() (err error) {
 	}
 	fmt.Println(string(content))
 
+	return
+}
+
+// init default content
+func initDefaultContent() (defaultContent string, err error) {
+	if len(config.Template) <= 0 {
+		return "", errors.New("日報のテンプレートを設定してください")
+	}
+	for _, chapter := range config.Template {
+		str := "## " + chapter + "\n\n\n"
+		defaultContent += str
+	}
 	return
 }
 
