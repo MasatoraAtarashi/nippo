@@ -56,6 +56,7 @@ func generateNippo() (err error) {
 	return
 }
 
+// make tmp file
 func makeTmpFile(msg string) (fpath string, err error) {
 	home := os.Getenv("HOME")
 	fpath = filepath.Join(home, "NIPPO_EDITMSG")
@@ -71,15 +72,18 @@ func makeTmpFile(msg string) (fpath string, err error) {
 	return
 }
 
+// ファイルの存在を確認する
 func isFileExist(fpath string) bool {
 	_, err := os.Stat(fpath)
 	return err == nil || !os.IsNotExist(err)
 }
 
+// ファイルを削除する
 func deleteFile(fpath string) error {
 	return os.Remove(fpath)
 }
 
+// エディタを開く
 func openEditor(program string, fpath string) error {
 	c := exec.Command(program, fpath)
 	c.Stdin = os.Stdin
