@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"github.com/spf13/cobra"
+	"os"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -12,6 +12,7 @@ import (
 var cfgFile string
 var config Config
 
+// Config is struct of config
 type Config struct {
 	Template []string
 }
@@ -22,6 +23,7 @@ var rootCmd = &cobra.Command{
 	Short: "A brief description of your application",
 }
 
+// Execute command
 func Execute() {
 	cobra.CheckErr(rootCmd.Execute())
 }
