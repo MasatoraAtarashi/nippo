@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -25,14 +26,14 @@ var generateCmd = &cobra.Command{
 
 func runGenerateCmd(cmd *cobra.Command, args []string) (err error) {
 	fmt.Println(config.Template)
-	err = generateNippo()
+	err = generateNippo(cmd)
 	return
 }
 
 // 日報作成
-func generateNippo() (err error) {
+func generateNippo(cmd *cobra.Command) (err error) {
 	// init default content
-	defaultContent, err := initDefaultContent()
+	defaultContent, err := initDefaultContent(cmd)
 
 	// make tmp file
 	fpath, err := makeTmpFile(defaultContent)
@@ -61,14 +62,38 @@ func generateNippo() (err error) {
 	return
 }
 
-// init default content
-func initDefaultContent() (defaultContent string, err error) {
+// init default content of 日報
+func initDefaultContent(cmd *cobra.Command) (defaultContent string, err error) {
 	if len(config.Template) <= 0 {
 		return "", errors.New("日報のテンプレートを設定してください")
 	}
+
+	// 日付を取得
+	date, err := getDate(cmd)
+	if err != nil {
+		return
+	}
+
+	defaultContent += "# " + date + "\n"
+
 	for _, chapter := range config.Template {
 		str := "## " + chapter + "\n\n\n"
 		defaultContent += str
+	}
+	return
+}
+
+// 日付を取得
+func getDate(cmd *cobra.Command) (date string, err error) {
+	const layout = "2006-01-02"
+	date, err = cmd.PersistentFlags().GetString("date")
+	if err != nil {
+		return
+	}
+	if date == "" {
+		date = time.Now().Format(layout)
+	} else {
+		date += " 00:00:00"
 	}
 	return
 }
