@@ -14,7 +14,7 @@ import (
 // generateCmd represents the generate command
 var generateCmd = &cobra.Command{
 	Use:   "generate",
-	Short: "A brief description of your command",
+	Short: "Generate nippo",
 	Run: func(cmd *cobra.Command, args []string) {
 		err := runGenerateCmd(cmd, args)
 		if err != nil {
