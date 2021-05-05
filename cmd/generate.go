@@ -90,11 +90,7 @@ func getDate(cmd *cobra.Command) (date string, err error) {
 	if err != nil {
 		return
 	}
-	if date == "" {
-		date = time.Now().Format(layout)
-	} else {
-		date += " 00:00:00"
-	}
+	date = time.Now().Format(layout)
 	return
 }
 
@@ -135,5 +131,6 @@ func openEditor(program string, fpath string) error {
 }
 
 func init() {
+	generateCmd.PersistentFlags().StringP("date", "d", "", "Specify date like <2021-04-24>")
 	rootCmd.AddCommand(generateCmd)
 }
