@@ -1,17 +1,15 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-	"github.com/spf13/cobra"
-
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
 var config Config
 
+// Config is struct of config
 type Config struct {
 	Template []string
 }
@@ -19,9 +17,10 @@ type Config struct {
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "nippo",
-	Short: "A brief description of your application",
+	Short: "Generate nippo",
 }
 
+// Execute command
 func Execute() {
 	cobra.CheckErr(rootCmd.Execute())
 }
@@ -49,16 +48,8 @@ func initConfig() {
 		// Search config in home directory with name ".nippo" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".nippo")
+		viper.SetConfigType("yaml")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-	}
-
-	if err := viper.Unmarshal(&config); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-	}
 }
