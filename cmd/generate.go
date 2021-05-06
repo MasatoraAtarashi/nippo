@@ -102,12 +102,14 @@ func initContent(cmd *cobra.Command) (content string, err error) {
 			if heading == "" {
 				heading = chapter
 			}
-			str = "## " + heading + "\n"
-			progress, err := getProgress(cmd, date)
+			progress, commitCnt, err := getProgress(cmd, date)
 			if err != nil {
 				return "", err
 			}
-			str += progress + "\n"
+			if commitCnt > 0 {
+				str = "## " + heading + "\n"
+				str += progress + "\n"
+			}
 		} else {
 			str = "## " + chapter + "\n\n\n"
 		}
@@ -130,9 +132,9 @@ func getDate(cmd *cobra.Command) (date string, err error) {
 }
 
 // その日の進捗(コミット)を取得
-func getProgress(cmd *cobra.Command, date string) (progress string, err error) {
+func getProgress(cmd *cobra.Command, date string) (progress string, commitCnt int, err error) {
 	if len(config.Git.Repositories) <= 0 {
-		return "", errors.New("リポジトリを指定してください")
+		return "", 0, errors.New("リポジトリを指定してください")
 	}
 
 	username, err := getUserName(cmd)
@@ -141,14 +143,13 @@ func getProgress(cmd *cobra.Command, date string) (progress string, err error) {
 	}
 
 	for _, repository := range config.Git.Repositories {
-		fmt.Println(repository)
 		var commits Commits
 		commits, err = getCommits(repository, username, date)
 		if commits.Count > 0 {
+			commitCnt += commits.Count
 			repositoryName := strings.Split(repository, "/")
 			progress += "### " + repositoryName[len(repositoryName)-1] + "(" + strconv.Itoa(commits.Count) + " commits)" + "\n"
 			progress += commits.Content
-			progress += "\n"
 		}
 	}
 	return
@@ -156,23 +157,18 @@ func getProgress(cmd *cobra.Command, date string) (progress string, err error) {
 
 // usernameを取得
 func getUserName(cmd *cobra.Command) (username string, err error) {
-	//username, err = cmd.PersistentFlags().GetString("user")
-	//if err != nil {
-	//	return
-	//}
-	//
-	//if username == "" {
-	//	out, err := exec.Command("git", "config", "user.name").Output()
-	//	if err != nil {
-	//		return "", err
-	//	}
-	//	username = string(out)
-	//}
-	out, err := exec.Command("git", "config", "user.name").Output()
+	username, err = cmd.PersistentFlags().GetString("user")
 	if err != nil {
-		return "", err
+		return
 	}
-	username = string(out)
+
+	if username == "" {
+		out, err := exec.Command("git", "config", "user.name").Output()
+		if err != nil {
+			return "", err
+		}
+		username = string(out)
+	}
 	return
 }
 
@@ -246,5 +242,6 @@ func openEditor(program string, fpath string) error {
 
 func init() {
 	generateCmd.PersistentFlags().StringP("date", "d", "", "Specify date like <2021-04-24>")
+	generateCmd.PersistentFlags().StringP("user", "u", "", "Specify user")
 	rootCmd.AddCommand(generateCmd)
 }
