@@ -12,6 +12,12 @@ var config Config
 // Config is struct of config
 type Config struct {
 	Template []string
+	Git GitConfig
+}
+
+// GitConfig is struct of config related to git
+type GitConfig struct {
+	Repositories []string
 }
 
 // rootCmd represents the base command when called without any subcommands
