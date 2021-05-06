@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Commits is struct of commit
 type Commits struct {
 	Content string
 	Count int
