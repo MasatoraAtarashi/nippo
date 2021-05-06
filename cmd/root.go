@@ -51,6 +51,7 @@ func initConfig() {
 		// Search config in home directory with name ".nippo" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".nippo")
+		viper.SetConfigType("yaml")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
