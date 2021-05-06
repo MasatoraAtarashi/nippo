@@ -123,7 +123,7 @@ func initContent(cmd *cobra.Command) (content string, err error) {
 			}
 
 			// slack上での発言を取得
-			remark, remarkCnt, err := getRemark(username, date)
+			remark, remarkCnt, err := getRemark(cmd, username, date)
 			if err != nil {
 				return "", err
 			}
@@ -226,7 +226,7 @@ func execGitCmd(cmdArgs []string) (out []byte, err error) {
 }
 
 // その日の発言を取得
-func getRemark(username string, date string) (remark string, remarkCnt int, err error) {
+func getRemark(cmd *cobra.Command, username string, date string) (remark string, remarkCnt int, err error) {
 	token := config.Slack.Token
 	if token == "" {
 		return "", 0, errors.New("SlackのAPI Tokenを設定してください\n")
@@ -238,10 +238,14 @@ func getRemark(username string, date string) (remark string, remarkCnt int, err 
 	startDate := dateTime.AddDate(0, 0, -1)
 	endDate := dateTime.AddDate(0, 0, 1)
 
+	count, err := cmd.PersistentFlags().GetInt8("count")
+	if err != nil {
+		return
+	}
 	params := &slack.SearchParameters{
 		Sort:          "score",
 		SortDirection: "desc",
-		Count:         100,
+		Count:         int(count),
 	}
 	messages, err := api.SearchMessages("from:@" + username + " after:" + startDate.Format(layout) + " before:" + endDate.Format(layout), *params)
 	if err != nil {
@@ -308,5 +312,6 @@ func init() {
 	generateCmd.PersistentFlags().StringP("date", "d", "", "Specify date like <2021-04-24>")
 	generateCmd.PersistentFlags().StringP("gituser", "g", "", "Specify git username")
 	generateCmd.PersistentFlags().StringP("slackuser", "s", "", "Specify slack username")
+	generateCmd.PersistentFlags().Int8P("count", "c", 100, "Specify count of remark to get")
 	rootCmd.AddCommand(generateCmd)
 }
