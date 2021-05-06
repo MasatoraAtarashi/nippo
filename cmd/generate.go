@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"github.com/slack-go/slack"
 	"github.com/spf13/viper"
 	"io/ioutil"
 	"os"
@@ -15,6 +16,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Commits is struct of commit
 type Commits struct {
 	Content string
 	Count int
@@ -51,6 +53,9 @@ func runGenerateCmd(cmd *cobra.Command, args []string) (err error) {
 func generateNippo(cmd *cobra.Command) (err error) {
 	// init default content
 	content, err := initContent(cmd)
+	if err != nil {
+		return
+	}
 
 	// make tmp file
 	fpath, err := makeTmpFile(content)
@@ -110,6 +115,22 @@ func initContent(cmd *cobra.Command) (content string, err error) {
 				str = "## " + heading + "\n"
 				str += progress + "\n"
 			}
+		} else if chapter == "slack" {
+			// slackのusernameを取得
+			username, err := getSlackUserName(cmd)
+			if err != nil {
+				return "", err
+			}
+
+			// slack上での発言を取得
+			remark, remarkCnt, err := getRemark(username, date)
+			if err != nil {
+				return "", err
+			}
+			if remarkCnt > 0 {
+				str = "## " + chapter + "\n"
+				str += remark
+			}
 		} else {
 			str = "## " + chapter + "\n\n\n"
 		}
@@ -134,10 +155,10 @@ func getDate(cmd *cobra.Command) (date string, err error) {
 // その日の進捗(コミット)を取得
 func getProgress(cmd *cobra.Command, date string) (progress string, commitCnt int, err error) {
 	if len(config.Git.Repositories) <= 0 {
-		return "", 0, errors.New("リポジトリを指定してください")
+		return "", 0, errors.New("リポジトリを指定してください\n")
 	}
 
-	username, err := getUserName(cmd)
+	username, err := getGitUserName(cmd)
 	if err != nil {
 		return
 	}
@@ -155,9 +176,9 @@ func getProgress(cmd *cobra.Command, date string) (progress string, commitCnt in
 	return
 }
 
-// usernameを取得
-func getUserName(cmd *cobra.Command) (username string, err error) {
-	username, err = cmd.PersistentFlags().GetString("user")
+// gitのusernameを取得
+func getGitUserName(cmd *cobra.Command) (username string, err error) {
+	username, err = cmd.PersistentFlags().GetString("gituser")
 	if err != nil {
 		return
 	}
@@ -204,6 +225,49 @@ func execGitCmd(cmdArgs []string) (out []byte, err error) {
 	return
 }
 
+// その日の発言を取得
+func getRemark(username string, date string) (remark string, remarkCnt int, err error) {
+	token := config.Slack.Token
+	if token == "" {
+		return "", 0, errors.New("SlackのAPI Tokenを設定してください\n")
+	}
+	api := slack.New(token)
+
+	const layout = "2006-01-02"
+	dateTime, err := time.Parse(layout, date)
+	startDate := dateTime.AddDate(0, 0, -1)
+	endDate := dateTime.AddDate(0, 0, 1)
+
+	params := &slack.SearchParameters{
+		Sort:          "score",
+		SortDirection: "desc",
+		Count:         100,
+	}
+	messages, err := api.SearchMessages("from:@" + username + " after:" + startDate.Format(layout) + " before:" + endDate.Format(layout), *params)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	for _, message := range messages.Matches {
+		remark += " - `" + message.Text + "` (" + message.Channel.Name + ")\n"
+	}
+	remarkCnt = len(messages.Matches)
+	return
+}
+
+func getSlackUserName(cmd *cobra.Command) (username string, err error) {
+	username, err = cmd.PersistentFlags().GetString("slackuser")
+	if err != nil {
+		return
+	}
+	if username == "" {
+		username = config.Slack.Username
+	}
+	if username == "" {
+		return "", errors.New("Slackのユーザー名を設定してください\n")
+	}
+	return
+}
+
 // make tmp file
 func makeTmpFile(msg string) (fpath string, err error) {
 	home := os.Getenv("HOME")
@@ -242,6 +306,7 @@ func openEditor(program string, fpath string) error {
 
 func init() {
 	generateCmd.PersistentFlags().StringP("date", "d", "", "Specify date like <2021-04-24>")
-	generateCmd.PersistentFlags().StringP("user", "u", "", "Specify user")
+	generateCmd.PersistentFlags().StringP("gituser", "g", "", "Specify git username")
+	generateCmd.PersistentFlags().StringP("slackuser", "s", "", "Specify slack username")
 	rootCmd.AddCommand(generateCmd)
 }
