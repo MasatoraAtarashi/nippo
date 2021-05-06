@@ -14,10 +14,16 @@ import (
 type DefaultConfig struct {
 	Template []string
 	Git DefaultGitConfig
+	Slack DefaultSlackConfig
 }
 
 type DefaultGitConfig struct {
 	Repositories []string
+}
+
+type DefaultSlackConfig struct {
+	Token string
+	Username string
 }
 
 // initCmd represents the init command
@@ -72,11 +78,17 @@ func makeConfigFile() (fpath string, err error) {
 // init default content of config
 func initDefaultContentOfConfig() (defaultContent []byte, err error) {
 	template := []string {"今日やったこと", "明日の予定", "所感・連絡事項", "git", "slack"}
-	repositories := []string {""}
+	repositories := []string {}
+	token := ""
+	username := ""
 	data := DefaultConfig{
 		Template: template,
 		Git: DefaultGitConfig{
 			Repositories: repositories,
+		},
+		Slack: DefaultSlackConfig{
+			Token: token,
+			Username: username,
 		},
 	}
 	defaultContent, err = yaml.Marshal(data)
