@@ -25,6 +25,7 @@ type GitConfig struct {
 // SlackConfig is struct of config related to slack
 type SlackConfig struct {
 	Token string
+	Username string
 }
 
 // rootCmd represents the base command when called without any subcommands

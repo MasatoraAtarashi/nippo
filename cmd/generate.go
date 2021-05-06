@@ -116,7 +116,14 @@ func initContent(cmd *cobra.Command) (content string, err error) {
 				str += progress + "\n"
 			}
 		} else if chapter == "slack" {
-			remark, remarkCnt, err := getRemark(date)
+			// slackのusernameを取得
+			username, err := getSlackUserName(cmd)
+			if err != nil {
+				return "", err
+			}
+
+			// slack上での発言を取得
+			remark, remarkCnt, err := getRemark(username, date)
 			if err != nil {
 				return "", err
 			}
@@ -151,7 +158,7 @@ func getProgress(cmd *cobra.Command, date string) (progress string, commitCnt in
 		return "", 0, errors.New("リポジトリを指定してください\n")
 	}
 
-	username, err := getUserName(cmd)
+	username, err := getGitUserName(cmd)
 	if err != nil {
 		return
 	}
@@ -169,9 +176,9 @@ func getProgress(cmd *cobra.Command, date string) (progress string, commitCnt in
 	return
 }
 
-// usernameを取得
-func getUserName(cmd *cobra.Command) (username string, err error) {
-	username, err = cmd.PersistentFlags().GetString("user")
+// gitのusernameを取得
+func getGitUserName(cmd *cobra.Command) (username string, err error) {
+	username, err = cmd.PersistentFlags().GetString("gituser")
 	if err != nil {
 		return
 	}
@@ -219,7 +226,7 @@ func execGitCmd(cmdArgs []string) (out []byte, err error) {
 }
 
 // その日の発言を取得
-func getRemark(date string) (remark string, remarkCnt int, err error) {
+func getRemark(username string, date string) (remark string, remarkCnt int, err error) {
 	token := config.Slack.Token
 	if token == "" {
 		return "", 0, errors.New("SlackのAPI Tokenを設定してください\n")
@@ -236,8 +243,7 @@ func getRemark(date string) (remark string, remarkCnt int, err error) {
 		SortDirection: "desc",
 		Count:         100,
 	}
-
-	messages, err := api.SearchMessages("from:@atarashi.masatora after:" + startDate.Format(layout) + " before:" + endDate.Format(layout), *params)
+	messages, err := api.SearchMessages("from:@" + username + " after:" + startDate.Format(layout) + " before:" + endDate.Format(layout), *params)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -245,6 +251,20 @@ func getRemark(date string) (remark string, remarkCnt int, err error) {
 		remark += " - `" + message.Text + "` (" + message.Channel.Name + ")\n"
 	}
 	remarkCnt = len(messages.Matches)
+	return
+}
+
+func getSlackUserName(cmd *cobra.Command) (username string, err error) {
+	username, err = cmd.PersistentFlags().GetString("slackuser")
+	if err != nil {
+		return
+	}
+	if username == "" {
+		username = config.Slack.Username
+	}
+	if username == "" {
+		return "", errors.New("Slackのユーザー名を設定してください\n")
+	}
 	return
 }
 
@@ -286,6 +306,7 @@ func openEditor(program string, fpath string) error {
 
 func init() {
 	generateCmd.PersistentFlags().StringP("date", "d", "", "Specify date like <2021-04-24>")
-	generateCmd.PersistentFlags().StringP("user", "u", "", "Specify user")
+	generateCmd.PersistentFlags().StringP("gituser", "g", "", "Specify git username")
+	generateCmd.PersistentFlags().StringP("slackuser", "s", "", "Specify slack username")
 	rootCmd.AddCommand(generateCmd)
 }
