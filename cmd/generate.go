@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -17,6 +18,16 @@ var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generate nippo",
 	Run: func(cmd *cobra.Command, args []string) {
+		// If a config file is found, read it in.
+		if err := viper.ReadInConfig(); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+
+		if err := viper.Unmarshal(&config); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
 		err := runGenerateCmd(cmd, args)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, err.Error())
