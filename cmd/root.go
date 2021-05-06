@@ -17,6 +17,7 @@ type Config struct {
 
 // GitConfig is struct of config related to git
 type GitConfig struct {
+	Heading string
 	Repositories []string
 }
 

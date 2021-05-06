@@ -96,9 +96,13 @@ func initContent(cmd *cobra.Command) (content string, err error) {
 	// コンテンツを追加
 	for _, chapter := range config.Template {
 		var str string
+		// 指定された日に積まれたコミットを追加
 		if chapter == "git" {
-			// 指定された日に積まれたコミットを追加
-			str = "## " + chapter + "\n"
+			heading := config.Git.Heading
+			if heading == "" {
+				heading = chapter
+			}
+			str = "## " + heading + "\n"
 			progress, err := getProgress(cmd, date)
 			if err != nil {
 				return "", err
