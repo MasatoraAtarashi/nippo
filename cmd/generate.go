@@ -234,7 +234,7 @@ func getRemark(date string) (remark string, remarkCnt int, err error) {
 	params := &slack.SearchParameters{
 		Sort:          "score",
 		SortDirection: "desc",
-		Count:         20,
+		Count:         100,
 	}
 
 	messages, err := api.SearchMessages("from:@atarashi.masatora after:" + startDate.Format(layout) + " before:" + endDate.Format(layout), *params)
