@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"github.com/slack-go/slack"
 	"github.com/spf13/viper"
 	"io/ioutil"
 	"os"
@@ -52,6 +53,9 @@ func runGenerateCmd(cmd *cobra.Command, args []string) (err error) {
 func generateNippo(cmd *cobra.Command) (err error) {
 	// init default content
 	content, err := initContent(cmd)
+	if err != nil {
+		return
+	}
 
 	// make tmp file
 	fpath, err := makeTmpFile(content)
@@ -111,6 +115,15 @@ func initContent(cmd *cobra.Command) (content string, err error) {
 				str = "## " + heading + "\n"
 				str += progress + "\n"
 			}
+		} else if chapter == "slack" {
+			remark, remarkCnt, err := getRemark(date)
+			if err != nil {
+				return "", err
+			}
+			if remarkCnt > 0 {
+				str = "## " + chapter + "\n"
+				str += remark
+			}
 		} else {
 			str = "## " + chapter + "\n\n\n"
 		}
@@ -135,7 +148,7 @@ func getDate(cmd *cobra.Command) (date string, err error) {
 // その日の進捗(コミット)を取得
 func getProgress(cmd *cobra.Command, date string) (progress string, commitCnt int, err error) {
 	if len(config.Git.Repositories) <= 0 {
-		return "", 0, errors.New("リポジトリを指定してください")
+		return "", 0, errors.New("リポジトリを指定してください\n")
 	}
 
 	username, err := getUserName(cmd)
@@ -202,6 +215,36 @@ func execGitCmd(cmdArgs []string) (out []byte, err error) {
 	)
 	cmd.Stderr = os.Stderr
 	out, err = cmd.Output()
+	return
+}
+
+// その日の発言を取得
+func getRemark(date string) (remark string, remarkCnt int, err error) {
+	token := config.Slack.Token
+	if token == "" {
+		return "", 0, errors.New("SlackのAPI Tokenを設定してください\n")
+	}
+	api := slack.New(token)
+
+	const layout = "2006-01-02"
+	dateTime, err := time.Parse(layout, date)
+	startDate := dateTime.AddDate(0, 0, -1)
+	endDate := dateTime.AddDate(0, 0, 1)
+
+	params := &slack.SearchParameters{
+		Sort:          "score",
+		SortDirection: "desc",
+		Count:         20,
+	}
+
+	messages, err := api.SearchMessages("from:@atarashi.masatora after:" + startDate.Format(layout) + " before:" + endDate.Format(layout), *params)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	for _, message := range messages.Matches {
+		remark += " - `" + message.Text + "` (" + message.Channel.Name + ")\n"
+	}
+	remarkCnt = len(messages.Matches)
 	return
 }
 
