@@ -90,7 +90,9 @@ func getDate(cmd *cobra.Command) (date string, err error) {
 	if err != nil {
 		return
 	}
-	date = time.Now().Format(layout)
+	if date == "" {
+		date = time.Now().Format(layout)
+	}
 	return
 }
 
