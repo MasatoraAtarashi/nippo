@@ -20,7 +20,7 @@ type Config struct {
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "nippo",
-	Short: "A brief description of your application",
+	Short: "Generate nippo",
 }
 
 // Execute command
