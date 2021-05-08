@@ -2,27 +2,29 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
-	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 
 	"github.com/spf13/cobra"
 )
 
 type DefaultConfig struct {
 	Template []string
-	Git DefaultGitConfig
-	Slack DefaultSlackConfig
+	Git      DefaultGitConfig
+	Slack    DefaultSlackConfig
 }
 
 type DefaultGitConfig struct {
+	Heading      string
 	Repositories []string
 }
 
 type DefaultSlackConfig struct {
-	Token string
+	Token    string
 	Username string
 }
 
@@ -77,17 +79,18 @@ func makeConfigFile() (fpath string, err error) {
 
 // init default content of config
 func initDefaultContentOfConfig() (defaultContent []byte, err error) {
-	template := []string {"今日やったこと", "明日の予定", "所感・連絡事項", "git", "slack"}
-	repositories := []string {}
+	template := []string{"今日やったこと", "明日の予定", "所感・連絡事項", "git", "slack"}
+	repositories := []string{}
 	token := ""
 	username := ""
 	data := DefaultConfig{
 		Template: template,
 		Git: DefaultGitConfig{
+			Heading:      "git",
 			Repositories: repositories,
 		},
 		Slack: DefaultSlackConfig{
-			Token: token,
+			Token:    token,
 			Username: username,
 		},
 	}
