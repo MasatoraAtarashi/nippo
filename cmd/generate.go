@@ -3,8 +3,6 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/slack-go/slack"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -12,6 +10,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/slack-go/slack"
+	"github.com/spf13/viper"
 
 	"github.com/spf13/cobra"
 )
@@ -155,7 +156,12 @@ func getDate(cmd *cobra.Command) (date string, err error) {
 // その日の進捗(コミット)を取得
 func getProgress(cmd *cobra.Command, date string) (progress string, commitCnt int, err error) {
 	if len(config.Git.Repositories) <= 0 {
-		return "", 0, errors.New("リポジトリを指定してください\n")
+		msg := "リポジトリを指定してください\n\n```$HOME/.nippo.yaml\ngit:\n    " +
+			"repositories: \n        " +
+			"#コミットを取得したいディレクトリの絶対パスを記入してください。\n        " +
+			"- \"Users/MasatoraAtarashi/workspace/hogehoge\"\n        " +
+			"- \"Users/MasatoraAtarashi/workspace/hogehoge2\"\n```\n"
+		return "", 0, errors.New(msg)
 	}
 
 	username, err := getGitUserName(cmd)
@@ -229,7 +235,10 @@ func execGitCmd(cmdArgs []string) (out []byte, err error) {
 func getRemark(cmd *cobra.Command, username string, date string) (remark string, remarkCnt int, err error) {
 	token := config.Slack.Token
 	if token == "" {
-		return "", 0, errors.New("SlackのAPI Tokenを設定してください\n")
+		msg := "SlackのAPI Tokenを設定してください\n\n```$HOME/.nippo.yaml\nslack:\n    " +
+			"token: \"\" #Slack APIトークンを記入してください。\n    " +
+			"username: \"\" #Slackのユーザ名を記入してください。\n```\n"
+		return "", 0, errors.New(msg)
 	}
 	api := slack.New(token)
 
@@ -267,7 +276,10 @@ func getSlackUserName(cmd *cobra.Command) (username string, err error) {
 		username = config.Slack.Username
 	}
 	if username == "" {
-		return "", errors.New("Slackのユーザー名を設定してください\n")
+		msg := "Slackのユーザー名を設定してください\n\n```$HOME/.nippo.yaml\nslack:\n    " +
+			"token: \"\" #Slack APIトークンを記入してください。\n    " +
+			"username: \"\" #Slackのユーザ名を記入してください。\n```\n"
+		return "", errors.New(msg)
 	}
 	return
 }
