@@ -14,18 +14,18 @@
 
 ### Homebrew
 
-    brew tap 
-    brew install 
+    $ brew tap 
+    $ brew install 
 
 ### go get
 
 Install
 
-    go get github.com/MasatoraAtarashi/nippo-generator
+    $ go get github.com/MasatoraAtarashi/nippo-generator
 
 Update
 
-    go get -u github.com/MasatoraAtarashi/nippo-generator
+    $ go get -u github.com/MasatoraAtarashi/nippo-generator
 
 ## How to use
 
@@ -38,7 +38,7 @@ User Token Scopesで`search:read`を指定してください。
 
 #### 2. 初期化する
 
-    nippo init
+    $ nippo init
 
 上記のコマンドで$HOME/.nippo.yamlという設定ファイルが生成されます。
 
@@ -69,7 +69,7 @@ slack:
 
 #### 4. 日報を生成する
 
-    nippot generate
+    $ nippot generate
 
 出力例
 
@@ -98,12 +98,6 @@ slack:
  - `こんにちは` (テスト)
 ```
 
-#### 5. その他の使い方
-
-##### 出力の形式を変更する
-
-- [ ] 書く
-
 ## Options
 
     -c, --count int8         Specify count of remark to get (default 100)
@@ -111,6 +105,7 @@ slack:
     -g, --gituser string     Specify git username
     -h, --help               help for generate
     -s, --slackuser string   Specify slack username
+
 
 ## Author
 
