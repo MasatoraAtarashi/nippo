@@ -258,7 +258,8 @@ func getRemark(cmd *cobra.Command, username string, date string) (remark string,
 	}
 	messages, err := api.SearchMessages("from:@"+username+" after:"+startDate.Format(layout)+" before:"+endDate.Format(layout), *params)
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println("Slack上の発言の取得に失敗しました。トークンが正しいか確認してください。\n")
+		return "", 0, nil
 	}
 	for _, message := range messages.Matches {
 		remark += " - `" + message.Text + "` (" + message.Channel.Name + ")\n"
