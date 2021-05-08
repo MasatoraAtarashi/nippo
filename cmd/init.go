@@ -12,17 +12,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// DefaultConfig is struct of default config
 type DefaultConfig struct {
 	Template []string
 	Git      DefaultGitConfig
 	Slack    DefaultSlackConfig
 }
 
+// DefaultGitConfig is struct of default config of git
 type DefaultGitConfig struct {
 	Heading      string
 	Repositories []string
 }
 
+// DefaultSlackConfig is struct of default config of slack
 type DefaultSlackConfig struct {
 	Token    string
 	Username string

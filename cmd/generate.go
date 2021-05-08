@@ -19,7 +19,7 @@ import (
 // Commits is struct of commit
 type Commits struct {
 	Content string
-	Count int
+	Count   int
 }
 
 // generateCmd represents the generate command
@@ -247,7 +247,7 @@ func getRemark(cmd *cobra.Command, username string, date string) (remark string,
 		SortDirection: "desc",
 		Count:         int(count),
 	}
-	messages, err := api.SearchMessages("from:@" + username + " after:" + startDate.Format(layout) + " before:" + endDate.Format(layout), *params)
+	messages, err := api.SearchMessages("from:@"+username+" after:"+startDate.Format(layout)+" before:"+endDate.Format(layout), *params)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

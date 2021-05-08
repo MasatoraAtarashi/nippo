@@ -12,19 +12,19 @@ var config Config
 // Config is struct of config
 type Config struct {
 	Template []string
-	Git GitConfig
-	Slack SlackConfig
+	Git      GitConfig
+	Slack    SlackConfig
 }
 
 // GitConfig is struct of config related to git
 type GitConfig struct {
-	Heading string
+	Heading      string
 	Repositories []string
 }
 
 // SlackConfig is struct of config related to slack
 type SlackConfig struct {
-	Token string
+	Token    string
 	Username string
 }
 
