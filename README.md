@@ -98,12 +98,6 @@ slack:
  - `こんにちは` (テスト)
 ```
 
-#### 5. その他の使い方
-
-##### 出力の形式を変更する
-
-- [ ] 書く
-
 ## Options
 
     -c, --count int8         Specify count of remark to get (default 100)
@@ -111,6 +105,7 @@ slack:
     -g, --gituser string     Specify git username
     -h, --help               help for generate
     -s, --slackuser string   Specify slack username
+
 
 ## Author
 
