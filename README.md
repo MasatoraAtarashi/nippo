@@ -29,20 +29,20 @@ Update
 
 ## How to use
 
-##### 1. SlackのAPIトークンを取得
+#### 1. SlackのAPIトークンを取得
 
 [こちらの手順](https://qiita.com/ykhirao/items/3b19ee6a1458cfb4ba21)を参考にSlackのAPIトークンを取得してください。
 
 User Token Scopesで`search:read`を指定してください。
 [![Image from Gyazo](https://i.gyazo.com/102a89d9cc86631437cb42a108bfee28.png)](https://gyazo.com/102a89d9cc86631437cb42a108bfee28)
 
-##### 2. 初期化する
+#### 2. 初期化する
 
     nippo init
 
 上記のコマンドで$HOME/.nippo.yamlという設定ファイルが生成されます。
 
-##### 3. 設定ファイルを編集する
+#### 3. 設定ファイルを編集する
 
 生成された設定ファイルを編集してください。
 
@@ -67,7 +67,7 @@ slack:
     username: "" #Slackのユーザ名を記入してください。
 ```
 
-##### 4. 日報を生成する
+#### 4. 日報を生成する
 
     nippot generate
 
@@ -98,9 +98,9 @@ slack:
  - `こんにちは` (テスト)
 ```
 
-##### 5. その他の使い方
+#### 5. その他の使い方
 
-###### 出力の形式を変更する
+##### 出力の形式を変更する
 
 - [ ] 書く
 
