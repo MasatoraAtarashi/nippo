@@ -3,6 +3,7 @@
 
 [![Apache License](http://img.shields.io/badge/license-Apache-blue.svg?style=flat)](LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/MasatoraAtarashi/nippo-generator)](https://goreportcard.com/report/github.com/MasatoraAtarashi/nippo-generator)
+[![GitHub release](https://img.shields.io/github/v/release/MasatoraAtarashi/nippo.svg)](https://github.com/MasatoraAtarashi/nippo)
 
 `nippo-generator`は日報を自動生成できるツールです。
 
