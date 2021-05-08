@@ -14,8 +14,7 @@
 
 ### Homebrew
 
-    $ brew tap 
-    $ brew install 
+    $ brew install masatoraatarashi/nippo/nippo
 
 ### go get
 
