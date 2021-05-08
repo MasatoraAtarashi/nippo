@@ -98,6 +98,9 @@ slack:
  - `こんにちは` (テスト)
 ```
 
+#### 5. その他
+設定ファイル($HOME/.nippo.yaml)の"template"から"git"や"slack"という項目を消せば、コミットやslack上の発言を日報に含めないようにすることができます。
+
 ## Options
 
     -c, --count int8         Specify count of remark to get (default 100)
