@@ -8,7 +8,7 @@
 
 その日に積んだコミットやSlackでの発言から自動で日報を生成します。
 
-- [ ] gif貼る
+[![Image from Gyazo](https://i.gyazo.com/473f48c6123473dc1c29fd919be0cc9f.gif)](https://gyazo.com/473f48c6123473dc1c29fd919be0cc9f)
 
 ## Installation
 
